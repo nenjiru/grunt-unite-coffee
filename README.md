@@ -36,13 +36,11 @@ CoffeeScript のコンパイルと HTMLファイルの SCRIPT要素の挿入を�
 
 サンプルの Gruntfile.js の設定例
 
-    var OUTPUT_JS   = 'app.js';        //結合ファイル名
-    var OUTPUT_DIR  = '../bin/';       //Gruntfile.js からみた出力ディレクトリ
-    var COFFEE_DIR  = 'coffee/';       //Gruntfile.js からみたCoffeeディレクトリ
-    var TEMPORARY   = '.coffee-tmp/';  //Gruntfile.js からみた一時ディレクトリ
-    var TARGET_HTML = '../index.html'; //Gruntfile.js からみた対象HTMLファイル
-    var SOURCE_DIR  = '_src/';         //TARGET_HTML からみた src ディレクトリ
-    var PACKAGE_DIR = 'bin/';          //TARGET_HTML からみた bin ディレクトリ
+    var TARGET_HTML = 'example.html'; //Gruntfile.js からみた対象HTMLのパス
+    var TARGET_JS   = 'bin/app.js';   //TARGET_HTML からみた出力ファイルのパス
+    var TARGET_SRC  = 'example/';     //TARGET_HTML からみたCoffeeディレクトリのパス
+    var TEMPORARY   = '.coffee-tmp/'; //Gruntfile.js からみた一時ディレクトリ
+    var MINIFY_JS   = 'bin/app.js';   //Gruntfile.js からみた出力ファイル
 
 #### ファイル設定
 
@@ -69,33 +67,26 @@ CoffeeScript のコンパイルと HTMLファイルの SCRIPT要素の挿入を�
   
 依存モジュールを npm install しておいてください。
 
-* grunt-contrib-watch
 * grunt-contrib-uglify
 
 タスクを直に編集するなら次の要素を修正します。
-ターゲットと attach をは揃っている必要があります。
 
     coffee : {
         //開発版 コンパイルした js を個別に読むようHTMLを書き換える
         dev: {
-            attach : 'dev',
-            source : COFFEE_DIR,
+            source : TARGET_SRC,
             temp   : TEMPORARY,
             src    : COFFEE_FILES,
-            target : TARGET_HTML,
-            srcdir : SOURCE_DIR
+            target : TARGET_HTML
         },
 
         //リリース版 圧縮結合した js を読むようHTMLを書き換える
         app: {
-            attach : 'app',
-            source : COFFEE_DIR,
+            source : TARGET_SRC,
             temp   : TEMPORARY,
             src    : COFFEE_FILES,
             target : TARGET_HTML,
-            srcdir : SOURCE_DIR,
-            outpack: COMPILE_JS,
-            package: INCLUDE_JS
+            output : TARGET_JS
         }
     }
 
