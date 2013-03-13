@@ -36,11 +36,11 @@ CoffeeScript のコンパイルと HTMLファイルの SCRIPT要素の挿入を�
 
 サンプルの Gruntfile.js の設定例
 
-    var TARGET_HTML = 'example.html'; //Gruntfile.js からみた対象HTMLのパス
-    var TARGET_JS   = 'bin/app.js';   //TARGET_HTML からみた出力ファイルのパス
-    var TARGET_SRC  = 'example/';     //TARGET_HTML からみたCoffeeディレクトリのパス
-    var TEMPORARY   = '.coffee-tmp/'; //Gruntfile.js からみた一時ディレクトリ
-    var MINIFY_JS   = 'bin/app.js';   //Gruntfile.js からみた出力ファイル
+    var MINIFY_JS   = 'bin/app.js';    //Gruntfile.js からみた圧縮対象ファイル
+    var TARGET_HTML = 'example.html';  //Gruntfile.js からみた対象HTMLのパス
+    var TARGET_JS   = 'bin/app.js';    //TARGET_HTML からみた出力ファイルのパス
+    var TARGET_SRC  = './';            //TARGET_HTML からみた Gruntfile.js ディレクトリ
+
 
 #### ファイル設定
 
@@ -74,16 +74,16 @@ CoffeeScript のコンパイルと HTMLファイルの SCRIPT要素の挿入を�
     coffee : {
         //開発版 コンパイルした js を個別に読むようHTMLを書き換える
         dev: {
+            temp   : '.coffee-tmp/',
             source : TARGET_SRC,
-            temp   : TEMPORARY,
             src    : COFFEE_FILES,
             target : TARGET_HTML
         },
 
         //リリース版 圧縮結合した js を読むようHTMLを書き換える
         app: {
+            temp   : '.coffee-tmp/',
             source : TARGET_SRC,
-            temp   : TEMPORARY,
             src    : COFFEE_FILES,
             target : TARGET_HTML,
             output : TARGET_JS

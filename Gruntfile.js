@@ -1,24 +1,23 @@
 //------------------------------------------------------------------------------
 //  Settings
 //------------------------------------------------------------------------------
+var MINIFY_JS   = 'bin/app.js';
 var TARGET_HTML = 'example.html';
-var TARGET_JS   = 'bin/app.js';   //targetからみて
-var TARGET_SRC  = 'example/';     //targetからみて
-var TEMPORARY   = '.coffee-tmp/'; //gruntからみて
-var MINIFY_JS   = 'bin/app.js';   //gruntからみて
+var TARGET_JS   = 'bin/app.js';
+var TARGET_SRC  = './';
 
 //------------------------------------------------------------------------------
 //  Source files
 //------------------------------------------------------------------------------
 var COFFEE_FILES = [
     //compile file
-    'package/Hello.coffee',
+    'example/package/Hello.coffee',
 
     //dev mode only
-    { 'dev' : 'dev.coffee' },
+    { 'dev' : 'example/dev.coffee' },
 
     //app mode only
-    { 'app' : 'app.coffee' }
+    { 'app' : 'example/app.coffee' }
 ];
 
 //------------------------------------------------------------------------------
@@ -36,15 +35,15 @@ module.exports = function(grunt)
         //Coffee compile
         coffee : {
             dev: {
+                temp   : '.coffee-tmp/',
                 source : TARGET_SRC,
-                temp   : TEMPORARY,
                 src    : COFFEE_FILES,
                 target : TARGET_HTML
             },
 
             app: {
+                temp   : '.coffee-tmp/',
                 source : TARGET_SRC,
-                temp   : TEMPORARY,
                 src    : COFFEE_FILES,
                 target : TARGET_HTML,
                 output : TARGET_JS

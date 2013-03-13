@@ -2,7 +2,8 @@ module.exports = function(grunt)
 {
     var log  = grunt.log,
         exec = require('child_process').exec,
-        files = [],
+        partialFiles = [],
+        tempFiles = [],
         data,
         done;
 
@@ -53,16 +54,14 @@ module.exports = function(grunt)
         var length = srcfile.length;
         for (i = 0; i < srcfile.length; i++)
         {
-            files.push(
-                copyAndCompile(source, temp, srcfile[i], --length, app)
-            );
+            copyAndCompile(source, temp, srcfile[i], --length, app);
         }
 
         //include code
         code += '<!-- INCLUDE-SCRIPT -->\n';
-        for (i = 0; i < files.length; i++)
+        for (i = 0; i < partialFiles.length; i++)
         {
-            code += '<script src="'+ files[i] +'"><\/script>\n';
+            code += '<script src="'+ partialFiles[i] +'"><\/script>\n';
         }
         code += '<!-- //INCLUDE-SCRIPT -->';
 
@@ -85,17 +84,22 @@ module.exports = function(grunt)
     /**
      * Coffee file copy
      * @param source {String} coffee directory
-     * @param output {String} js directory
+     * @param temp {String} temp directory
      * @param file {String} coffee file
      * @param count {Number} left file
      * @param app {Boolean} app mode
      */
-    function copyAndCompile (source, output, file, count, app)
+    function copyAndCompile (source, temp, file, count, app)
     {
-        var copy = file.replace(/\//g, '.');
-        grunt.file.copy(source + file, output + copy);
-        compile(output + copy, count, app);
-        return output + copy.replace('.coffee', '.js');
+        var copy = file.replace(/\//g, '.'),
+            copyCoffee = temp + copy,
+            copyJS = copyCoffee.replace(/\.coffee$/, '.js');
+
+        tempFiles.push(copyJS);
+        partialFiles.push(source + copyJS);
+
+        grunt.file.copy(file, copyCoffee);
+        compile(copyCoffee, count, app);
     }
 
     /**
@@ -140,9 +144,9 @@ module.exports = function(grunt)
             temp = data.temp,
             concat = '';
 
-         for (var i = 0; i < files.length; i++)
+         for (var i = 0; i < tempFiles.length; i++)
          {
-             concat += grunt.file.read(files[i]);
+             concat += grunt.file.read(tempFiles[i]);
          }
 
          grunt.file.write(output, concat);
