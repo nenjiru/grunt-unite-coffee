@@ -1,96 +1,73 @@
 module.exports = function(grunt)
 {
     var log  = grunt.log,
-        process = require('child_process');
+        exec = require('child_process').exec,
+        files = [],
+        data,
+        done;
 
     grunt.registerMultiTask('coffee', 'coffee script', function()
     {
-        var target = this.target,
-            data = this.data;
+        data = this.data;
+        done = this.async();
 
-        switch (target)
+        switch (this.target)
         {
-            case 'dev': partialInclude (data); break;
-            case 'app': uniteInclude (data); break;
+            case 'dev': partialInclude (data, 'dev', false); break;
+            case 'app': partialInclude (data, 'app', true); break;
         }
     });
 
     /**
-     * App mode
-     * @param data
-     */
-    function uniteInclude (data)
-    {
-        var files = partialInclude (data),
-            package = data.package,
-            outpack = data.outpack,
-            target = data.target,
-            concat = '';
-
-        for (var i = 0; i < files.length; i++)
-        {
-            concat += grunt.file.read(files[i]);
-        }
-
-        grunt.file.write(outpack, concat);
-
-        var code = '<!-- INCLUDE-SCRIPT -->\n';
-            code += '<script src="'+ package +'"><\/script>\n';
-            code += '<!-- //INCLUDE-SCRIPT -->';
-
-        //HTMLに出力
-        includeToHTML(target, code);
-
-        //Minify
-        grunt.task.run('uglify:js');
-    }
-
-    /**
      * Develop mode
-     * @param data
-     * @return {Array} jsfile
+     * @param data {Object}
+     * @param attach {String}
+     * @param app {Boolean}
      */
-    function partialInclude (data)
+    function partialInclude (data, attach, app)
     {
-        var source = data.source,
-            temp   = data.temp,
-            files  = data.src,
-            attach = data.attach,
-            target = data.target,
-            srcdir = data.srcdir,
-            file   = '',
-            code   = '',
-            jsfile = [],
-            js;
+        var source  = data.source,
+            temp    = data.temp,
+            srclist = data.src,
+            target  = data.target,
+            srcfile = [],
+            code    = '',
+            src,
+            i;
 
-        for (var i = 0; i < files.length; i++)
+        for (i = 0; i < srclist.length; i++)
         {
-            js = null;
-            file = files[i];
+            src = srclist[i];
 
-            if (typeof file === 'string')
+            if (typeof src === 'string')
             {
-                js = copyAndCompile(source, temp, file);
-                jsfile.push(js);
+                srcfile.push(src);
             }
-            else if (typeof file === 'object' && file[attach])
+            else if (typeof src === 'object' && src[attach])
             {
-                js = copyAndCompile(source, temp, file[attach]);
-                jsfile.push(js);
+                srcfile.push(src[attach]);
             }
         }
 
-        code += '<!-- INCLUDE-SCRIPT -->\n';
-        for (i = 0; i < jsfile.length; i++)
+        //copy & compile
+        var length = srcfile.length;
+        for (i = 0; i < srcfile.length; i++)
         {
-            code += '<script src="'+ srcdir + jsfile[i] +'"><\/script>\n';
+            files.push(
+                copyAndCompile(source, temp, srcfile[i], --length, app)
+            );
+        }
+
+        //include code
+        code += '<!-- INCLUDE-SCRIPT -->\n';
+        for (i = 0; i < files.length; i++)
+        {
+            code += '<script src="'+ files[i] +'"><\/script>\n';
         }
         code += '<!-- //INCLUDE-SCRIPT -->';
 
-        //HTMLに出力
+        //output script tag
         includeToHTML(target, code);
-
-        return jsfile;
     }
 
 
@@ -110,25 +87,28 @@ module.exports = function(grunt)
      * @param source {String} coffee directory
      * @param output {String} js directory
      * @param file {String} coffee file
-     * @return {String} copy path
+     * @param count {Number} left file
+     * @param app {Boolean} app mode
      */
-    function copyAndCompile (source, output, file)
+    function copyAndCompile (source, output, file, count, app)
     {
         var copy = file.replace(/\//g, '.');
         grunt.file.copy(source + file, output + copy);
-        compile(output + copy);
+        compile(output + copy, count, app);
         return output + copy.replace('.coffee', '.js');
     }
 
     /**
      * Coffee compile
      * @param file {String} target
+     * @param count {Number} left file
+     * @param app {Boolean} app mode
      */
-    function compile (file)
+    function compile (file, count, app)
     {
         var command = 'coffee -cbm ' + file;
 
-        process.exec(command, function(error, stdout, stderr)
+        exec(command, function(error, stdout, stderr)
         {
             if(error || stderr)
             {
@@ -139,8 +119,45 @@ module.exports = function(grunt)
             else
             {
                 log.writeln('File "' + file + '" created.');
+
+                if (count <= 0 && app === true)
+                {
+                    uniteInclude();
+                    done();
+                }
             }
         });
     }
 
+
+    /**
+     * App mode
+     */
+    function uniteInclude ()
+    {
+        var target = data.target,
+            output = data.output,
+            temp = data.temp,
+            concat = '';
+
+         for (var i = 0; i < files.length; i++)
+         {
+             concat += grunt.file.read(files[i]);
+         }
+
+         grunt.file.write(output, concat);
+
+         var code = '<!-- INCLUDE-SCRIPT -->\n';
+         code += '<script src="'+ output +'"><\/script>\n';
+         code += '<!-- //INCLUDE-SCRIPT -->';
+
+         //output script tag
+         includeToHTML(target, code);
+
+         //remove temp
+         grunt.file.delete(temp);
+
+         //Minify
+         grunt.task.run('uglify:js');
+    }
 };

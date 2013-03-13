@@ -1,20 +1,18 @@
 //------------------------------------------------------------------------------
 //  Settings
 //------------------------------------------------------------------------------
-var OUTPUT_JS   = 'app.js';
-var OUTPUT_DIR  = '../bin/';
-var COFFEE_DIR  = 'coffee/';
-var TARGET_HTML = '../index.html';
-var SOURCE_DIR  = '_src/';
-var PACKAGE_DIR = 'bin/';
-var TEMPORARY   = '.coffee-tmp/';
+var TARGET_HTML = 'example.html';
+var TARGET_JS   = 'bin/app.js';   //targetからみて
+var TARGET_SRC  = 'example/';     //targetからみて
+var TEMPORARY   = '.coffee-tmp/'; //gruntからみて
+var MINIFY_JS   = 'bin/app.js';   //gruntからみて
 
 //------------------------------------------------------------------------------
 //  Source files
 //------------------------------------------------------------------------------
 var COFFEE_FILES = [
     //compile file
-    'coffee/Coffee.coffee',
+    'package/Hello.coffee',
 
     //dev mode only
     { 'dev' : 'dev.coffee' },
@@ -33,26 +31,23 @@ module.exports = function(grunt)
 
     grunt.initConfig({
 
+        pkg: grunt.file.readJSON('package.json'),
+
         //Coffee compile
         coffee : {
             dev: {
-                attach : 'dev',
-                source : COFFEE_DIR,
+                source : TARGET_SRC,
                 temp   : TEMPORARY,
                 src    : COFFEE_FILES,
-                target : TARGET_HTML,
-                srcdir : SOURCE_DIR
+                target : TARGET_HTML
             },
 
             app: {
-                attach : 'app',
-                source : COFFEE_DIR,
+                source : TARGET_SRC,
                 temp   : TEMPORARY,
                 src    : COFFEE_FILES,
                 target : TARGET_HTML,
-                srcdir : SOURCE_DIR,
-                outpack: OUTPUT_DIR + OUTPUT_JS,
-                package: PACKAGE_DIR + OUTPUT_JS
+                output : TARGET_JS
             }
         },
 
@@ -63,8 +58,8 @@ module.exports = function(grunt)
                     preserveComments: 'some',
                     banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */'
                 },
-                src: OUTPUT_DIR + OUTPUT_JS,
-                dest: OUTPUT_DIR + OUTPUT_JS
+                src: MINIFY_JS,
+                dest: MINIFY_JS
             }
         }
     });
