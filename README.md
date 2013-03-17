@@ -4,8 +4,11 @@
 CoffeeScript のコンパイルと HTMLファイルの SCRIPT要素の挿入を行う Grunt task です。  
 コンパイル時にモードを指定することで SCRIPT要素の挿入方法を制御します。
 
+## サンプルをつかう
 
-## DEV版
+Gruntfile.js のあるディレクトリで npm install します。
+
+## DEV版で出力する
 
 >$ grunt coffee:dev
 
@@ -16,7 +19,7 @@ CoffeeScript のコンパイルと HTMLファイルの SCRIPT要素の挿入を�
 .coffee を階層に分けてしまうと sourcemap のリンクが切れてしまう問題に対応するため、一時的に temp ディレクトリに .map を生成しています。
 
 
-## APP版
+## APP版で出力する
 
 >$ grunt coffee:app
 
@@ -45,7 +48,8 @@ CoffeeScript のコンパイルと HTMLファイルの SCRIPT要素の挿入を�
 #### ファイル設定
 
 記述順通りにHTMLに挿入されます。  
-またコンパイル時にモードに応じたファイルのみを読み込ませることもできます。
+またコンパイル時にモードに応じたファイルのみを読み込ませることもできます。  
+設定をJSONファイルにしておくこともできます。
 
     var COFFEE_FILES = [
         //compile file
@@ -61,15 +65,12 @@ CoffeeScript のコンパイルと HTMLファイルの SCRIPT要素の挿入を�
 ### 詳細設定
 
 タスクを読み込みます。
+依存モジュールを npm install しておいてください。
 
     grunt.loadTasks('tasks');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-  
-依存モジュールを npm install しておいてください。
 
-* grunt-contrib-uglify
-
-タスクを直に編集するなら次の要素を修正します。
+タスクを直に編集するなら Gruntfile.js に次のように設定します。
 
     coffee : {
         //開発版 コンパイルした js を個別に読むようHTMLを書き換える

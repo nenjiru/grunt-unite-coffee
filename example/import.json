@@ -1,0 +1,9 @@
+{
+    "files": [
+        "example/package/Hello.coffee",
+
+        { "dev" : "example/dev.coffee" },
+
+        { "app" : "example/app.coffee" }
+    ]
+}
