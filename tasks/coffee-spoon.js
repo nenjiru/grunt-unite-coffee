@@ -7,7 +7,7 @@ module.exports = function(grunt)
         data,
         done;
 
-    grunt.registerMultiTask('coffee', 'coffee script', function()
+    grunt.task.registerMultiTask('coffee', 'CoffeeScript compile', function()
     {
         data = this.data;
         done = this.async();
@@ -99,6 +99,7 @@ module.exports = function(grunt)
         partialFiles.push(source + copyJS);
 
         grunt.file.copy(file, copyCoffee);
+
         compile(copyCoffee, count, app);
     }
 
@@ -110,58 +111,72 @@ module.exports = function(grunt)
      */
     function compile (file, count, app)
     {
-        var command = 'coffee -cbm ' + file;
+        var command = 'coffee -cb';
+
+        if (app === false)
+        {
+            command += 'm';
+        }
+
+        command += ' '+ file;
 
         exec(command, function(error, stdout, stderr)
         {
             if(error || stderr)
             {
-                log.writeln('File "' + file + '" failed.');
-                console.log(error);
+                log.writeln('coffee-spoon "' + file + '" failed.');
                 done(false);
             }
             else
             {
-                log.writeln('File "' + file + '" created.');
+                log.writeln('coffee-spoon "' + file + '" created.');
 
-                if (count <= 0 && app === true)
+                if (count <= 0)
                 {
-                    uniteInclude();
-                    done();
+                    if (app === true)
+                    {
+                        uniteInclude(function ()
+                        {
+                            done(true);
+                        });
+                    }
+                    else
+                    {
+                        done(true);
+                    }
                 }
             }
         });
     }
 
-
     /**
      * App mode
      */
-    function uniteInclude ()
+    function uniteInclude (callback)
     {
-        var target = data.target,
-            output = data.output,
-            temp = data.temp,
-            concat = '';
+        var target  = data.target,
+            output  = data.output,
+            include = data.include,
+            temp    = data.temp,
+            concat  = '';
 
-         for (var i = 0; i < tempFiles.length; i++)
-         {
-             concat += grunt.file.read(tempFiles[i]);
-         }
+        for (var i = 0; i < tempFiles.length; i++)
+        {
+            concat += grunt.file.read(tempFiles[i]);
+        }
 
-         grunt.file.write(output, concat);
+        grunt.file.write(output, concat);
 
-         var code = '<!-- INCLUDE-SCRIPT -->\n';
-         code += '<script src="'+ output +'"><\/script>\n';
-         code += '<!-- //INCLUDE-SCRIPT -->';
+        var code = '<!-- INCLUDE-SCRIPT -->\n';
+        code += '<script src="'+ include +'"><\/script>\n';
+        code += '<!-- //INCLUDE-SCRIPT -->';
 
-         //output script tag
-         includeToHTML(target, code);
+        //output script tag
+        includeToHTML(target, code);
 
-         //remove temp
-         grunt.file.delete(temp);
+        //remove temp
+        grunt.file.delete(temp);
 
-         //Minify
-         grunt.task.run('uglify:js');
+        callback();
     }
 };

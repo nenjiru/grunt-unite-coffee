@@ -25,8 +25,9 @@ Gruntfile.js のあるディレクトリで npm install します。
 
 リリース版でコンパイルします。  
 分割された coffee を1つの js ファイルに結合します。  
-結合圧縮された js の読み込みタグをHTMLに差し込むとこまで行います。
+結合された js の読み込みタグをHTMLに差し込むとこまで行います。
 
+※ミニファイ化は grunt-contrib-uglify などを使用してください
 
 ### 準備
 
@@ -39,10 +40,11 @@ Gruntfile.js のあるディレクトリで npm install します。
 
 サンプルの Gruntfile.js の設定例
 
-    var MINIFY_JS   = 'bin/app.js';    //Gruntfile.js からみた圧縮対象ファイル
-    var TARGET_HTML = 'example.html';  //Gruntfile.js からみた対象HTMLのパス
-    var TARGET_JS   = 'bin/app.js';    //TARGET_HTML からみた出力ファイルのパス
-    var TARGET_SRC  = './';            //TARGET_HTML からみた Gruntfile.js ディレクトリ
+    var IMPORT_FILE = 'example/import.json'; //Gruntfile.js からみた設定ファイルのパス
+    var OUTPUT_JS   = 'bin/app.js';          //Gruntfile.js からみた出力ファイル名
+    var TARGET_HTML = 'example.html';        //Gruntfile.js からみた対象HTMLのパス
+    var TARGET_JS   = 'bin/app.js';          //TARGET_HTML からみた出力ファイルのパス
+    var TARGET_SRC  = './';                  //TARGET_HTML からみた Gruntfile.js ディレクトリ
 
 
 #### ファイル設定
@@ -68,7 +70,11 @@ Gruntfile.js のあるディレクトリで npm install します。
 依存モジュールを npm install しておいてください。
 
     grunt.loadTasks('tasks');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
+
+読み込みファイルを外部化してある場合はこれをロードしておきます。
+
+    var setting = grunt.file.readJSON(IMPORT_FILE);
+
 
 タスクを直に編集するなら Gruntfile.js に次のように設定します。
 
@@ -77,7 +83,7 @@ Gruntfile.js のあるディレクトリで npm install します。
         dev: {
             temp   : '.coffee-tmp/',
             source : TARGET_SRC,
-            src    : COFFEE_FILES,
+            src    : setting.files,
             target : TARGET_HTML
         },
 
@@ -85,9 +91,10 @@ Gruntfile.js のあるディレクトリで npm install します。
         app: {
             temp   : '.coffee-tmp/',
             source : TARGET_SRC,
-            src    : COFFEE_FILES,
+            src    : setting.files,
+            output : OUTPUT_JS,
             target : TARGET_HTML,
-            output : TARGET_JS
+            include: TARGET_JS
         }
     }
 

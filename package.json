@@ -1,9 +1,8 @@
 {
     "name": "coffee-spoon",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "example coffee-spoon",
     "devDependencies": {
-        "grunt": "~0.4.0",
-        "grunt-contrib-uglify": "~0.1.1"
+        "grunt": "~0.4.0"
     }
 }
