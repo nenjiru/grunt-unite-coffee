@@ -7,7 +7,7 @@ module.exports = function(grunt)
         data,
         done;
 
-    grunt.task.registerMultiTask('coffee', 'CoffeeScript compile', function()
+    grunt.task.registerMultiTask('unite-coffee', 'CoffeeScript compile', function()
     {
         data = this.data;
         done = this.async();

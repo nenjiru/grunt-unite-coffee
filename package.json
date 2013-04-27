@@ -1,8 +1,9 @@
 {
-    "name": "coffee-spoon",
-    "version": "0.0.3",
-    "description": "example coffee-spoon",
+    "name": "grunt-unite-coffee",
+    "version": "0.0.4",
+    "description": "example unite-coffee",
     "devDependencies": {
-        "grunt": "~0.4.0"
+        "grunt": "~0.4.0",
+        "grunt-unite-coffee": "git://github.com/nenjiru/grunt-unite-coffee.git"
     }
 }

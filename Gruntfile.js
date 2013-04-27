@@ -12,14 +12,12 @@ var TARGET_SRC  = './';
 //------------------------------------------------------------------------------
 module.exports = function(grunt)
 {
-    grunt.loadTasks('tasks');
-
     var setting = grunt.file.readJSON(IMPORT_FILE);
 
     grunt.initConfig({
 
         //Coffee compile
-        coffee : {
+        "unite-coffee" : {
             dev: {
                 temp   : '.coffee-tmp/',
                 source : TARGET_SRC,
@@ -36,4 +34,7 @@ module.exports = function(grunt)
             }
         }
     });
+
+    //grunt.loadTasks('tasks');
+    grunt.loadNpmTasks('grunt-unite-coffee');
 };

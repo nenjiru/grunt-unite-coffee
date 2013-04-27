@@ -10,7 +10,7 @@ Gruntfile.js のあるディレクトリで npm install します。
 
 ## DEV版で出力する
 
->$ grunt coffee:dev
+>$ grunt unite-coffee:dev
 
 開発モードでコンパイルします。  
 分割された coffee を未結合のまま js へ変換し sourcemap 付きで出力します。
@@ -21,7 +21,7 @@ Gruntfile.js のあるディレクトリで npm install します。
 
 ## APP版で出力する
 
->$ grunt coffee:app
+>$ grunt unite-coffee:app
 
 リリース版でコンパイルします。  
 分割された coffee を1つの js ファイルに結合します。  
@@ -78,7 +78,7 @@ Gruntfile.js のあるディレクトリで npm install します。
 
 タスクを直に編集するなら Gruntfile.js に次のように設定します。
 
-    coffee : {
+    unite-coffee : {
         //開発版 コンパイルした js を個別に読むようHTMLを書き換える
         dev: {
             temp   : '.coffee-tmp/',
